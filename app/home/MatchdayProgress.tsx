@@ -1,20 +1,20 @@
-const TOTAL_MATCHES   = 66
-const MATCHES_PER_DAY = 6
-const TOTAL_MATCHDAYS = 11
-
 interface MatchdayProgressProps {
   playedCount: number
+  playerCount: number
 }
 
-export function MatchdayProgress({ playedCount }: MatchdayProgressProps) {
-  const matchday    = Math.min(Math.ceil(playedCount / MATCHES_PER_DAY) || 1, TOTAL_MATCHDAYS)
-  const fillPercent = Math.min((playedCount / TOTAL_MATCHES) * 100, 100)
-  const isStart     = playedCount === 0
+export function MatchdayProgress({ playedCount, playerCount }: MatchdayProgressProps) {
+  const totalMatches    = Math.floor(playerCount * (playerCount - 1) / 2)
+  const matchesPerRound = Math.max(Math.floor(playerCount / 2), 1)
+  const totalRounds     = Math.max(playerCount - 1, 1)
+  const currentRound    = Math.min(Math.ceil(playedCount / matchesPerRound) || 1, totalRounds)
+  const fillPercent     = totalMatches > 0 ? Math.min((playedCount / totalMatches) * 100, 100) : 0
+  const isStart         = playedCount === 0
 
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm font-medium text-text">
-        Matchday {matchday} of {TOTAL_MATCHDAYS}
+        Matchday {currentRound} of {totalRounds}
         {isStart && <span className="text-text-muted font-normal"> — Get started!</span>}
       </p>
 
@@ -25,13 +25,13 @@ export function MatchdayProgress({ playedCount }: MatchdayProgressProps) {
           role="progressbar"
           aria-valuenow={playedCount}
           aria-valuemin={0}
-          aria-valuemax={TOTAL_MATCHES}
-          aria-label={`${playedCount} of ${TOTAL_MATCHES} matches played`}
+          aria-valuemax={totalMatches}
+          aria-label={`${playedCount} of ${totalMatches} matches played`}
         />
       </div>
 
       <p className="text-xs text-text-muted text-right tabular-nums">
-        {playedCount} of {TOTAL_MATCHES} matches played
+        {playedCount} of {totalMatches} matches played
       </p>
     </div>
   )

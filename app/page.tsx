@@ -65,7 +65,7 @@ export default async function HomePage() {
         <MyPositionBanner standings={standings} players={playerList} allMatches={matchList} />
       )}
       {stage === 'league' && <LiveAwardsStrip awards={awards} />}
-      {stage === 'league' && <MatchdayProgress playedCount={played.length} />}
+      {stage === 'league' && <MatchdayProgress playedCount={played.length} playerCount={playerList.length} />}
       {stage === 'league' && <TopThreeCards standings={standings} />}
 
       <RecentResults matches={recent} playerMap={playerMap} />
