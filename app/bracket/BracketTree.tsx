@@ -13,6 +13,8 @@ interface BracketTreeProps {
 export function BracketTree({ bracket, stage }: BracketTreeProps) {
   useRealtimeMatches('bracket-realtime')
 
+  const hasSemis = bracket.sf1 !== null && bracket.sf2 !== null
+
   return (
     <div className="flex flex-col gap-6">
       {/* Champion card (completed stage) */}
@@ -31,33 +33,33 @@ export function BracketTree({ bracket, stage }: BracketTreeProps) {
 
       {/* Desktop: SF columns left, Final right */}
       <div className="hidden md:flex items-center gap-0">
-        {/* SF column */}
-        <div className="flex flex-col gap-8">
-          <BracketNode
-            home={bracket.sf1.home}
-            away={bracket.sf1.away}
-            match={bracket.sf1.match}
-            label="Semi-final 1"
-          />
-          <BracketNode
-            home={bracket.sf2.home}
-            away={bracket.sf2.away}
-            match={bracket.sf2.match}
-            label="Semi-final 2"
-          />
-        </div>
+        {hasSemis && (
+          <>
+            {/* SF column */}
+            <div className="flex flex-col gap-8">
+              <BracketNode
+                home={bracket.sf1!.home}
+                away={bracket.sf1!.away}
+                match={bracket.sf1!.match}
+                label="Semi-final 1"
+              />
+              <BracketNode
+                home={bracket.sf2!.home}
+                away={bracket.sf2!.away}
+                match={bracket.sf2!.match}
+                label="Semi-final 2"
+              />
+            </div>
 
-        {/* Connector lines */}
-        <svg width="64" height="180" className="shrink-0" aria-hidden>
-          {/* SF1 arm */}
-          <line x1="0" y1="38" x2="32" y2="38"  stroke="#2e2e2e" strokeWidth="1.5"/>
-          {/* SF2 arm */}
-          <line x1="0" y1="142" x2="32" y2="142" stroke="#2e2e2e" strokeWidth="1.5"/>
-          {/* Vertical connector */}
-          <line x1="32" y1="38"  x2="32" y2="142" stroke="#2e2e2e" strokeWidth="1.5"/>
-          {/* Final arm */}
-          <line x1="32" y1="90"  x2="64" y2="90"  stroke="#2e2e2e" strokeWidth="1.5"/>
-        </svg>
+            {/* Connector lines */}
+            <svg width="64" height="180" className="shrink-0" aria-hidden>
+              <line x1="0" y1="38" x2="32" y2="38"  stroke="#2e2e2e" strokeWidth="1.5"/>
+              <line x1="0" y1="142" x2="32" y2="142" stroke="#2e2e2e" strokeWidth="1.5"/>
+              <line x1="32" y1="38"  x2="32" y2="142" stroke="#2e2e2e" strokeWidth="1.5"/>
+              <line x1="32" y1="90"  x2="64" y2="90"  stroke="#2e2e2e" strokeWidth="1.5"/>
+            </svg>
+          </>
+        )}
 
         {/* Final */}
         <BracketNode
@@ -70,28 +72,32 @@ export function BracketTree({ bracket, stage }: BracketTreeProps) {
 
       {/* Mobile: vertical stack */}
       <div className="flex md:hidden flex-col gap-4">
-        <BracketNode
-          home={bracket.sf1.home}
-          away={bracket.sf1.away}
-          match={bracket.sf1.match}
-          label="Semi-final 1"
-        />
-        <div className="flex justify-center">
-          <svg width="2" height="24" aria-hidden>
-            <line x1="1" y1="0" x2="1" y2="24" stroke="#2e2e2e" strokeWidth="1.5"/>
-          </svg>
-        </div>
-        <BracketNode
-          home={bracket.sf2.home}
-          away={bracket.sf2.away}
-          match={bracket.sf2.match}
-          label="Semi-final 2"
-        />
-        <div className="flex justify-center">
-          <svg width="2" height="24" aria-hidden>
-            <line x1="1" y1="0" x2="1" y2="24" stroke="#2e2e2e" strokeWidth="1.5"/>
-          </svg>
-        </div>
+        {hasSemis && (
+          <>
+            <BracketNode
+              home={bracket.sf1!.home}
+              away={bracket.sf1!.away}
+              match={bracket.sf1!.match}
+              label="Semi-final 1"
+            />
+            <div className="flex justify-center">
+              <svg width="2" height="24" aria-hidden>
+                <line x1="1" y1="0" x2="1" y2="24" stroke="#2e2e2e" strokeWidth="1.5"/>
+              </svg>
+            </div>
+            <BracketNode
+              home={bracket.sf2!.home}
+              away={bracket.sf2!.away}
+              match={bracket.sf2!.match}
+              label="Semi-final 2"
+            />
+            <div className="flex justify-center">
+              <svg width="2" height="24" aria-hidden>
+                <line x1="1" y1="0" x2="1" y2="24" stroke="#2e2e2e" strokeWidth="1.5"/>
+              </svg>
+            </div>
+          </>
+        )}
         <BracketNode
           home={bracket.final.home}
           away={bracket.final.away}

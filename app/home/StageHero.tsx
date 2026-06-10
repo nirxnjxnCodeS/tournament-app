@@ -74,20 +74,33 @@ export function StageHero({ stage, matchdayNumber, standings, bracket, isAdmin }
       <div className="bg-surface border border-border rounded-card px-5 py-5 flex flex-col gap-3">
         <p className="text-xs font-semibold text-accent uppercase tracking-wider">Knockout Stage</p>
         <div className="flex flex-col gap-2">
-          <BracketNode
-            home={bracket.sf1.home}
-            away={bracket.sf1.away}
-            match={bracket.sf1.match}
-            label="SF 1"
-            compact
-          />
-          <BracketNode
-            home={bracket.sf2.home}
-            away={bracket.sf2.away}
-            match={bracket.sf2.match}
-            label="SF 2"
-            compact
-          />
+          {bracket.sf1 && (
+            <BracketNode
+              home={bracket.sf1.home}
+              away={bracket.sf1.away}
+              match={bracket.sf1.match}
+              label="SF 1"
+              compact
+            />
+          )}
+          {bracket.sf2 && (
+            <BracketNode
+              home={bracket.sf2.home}
+              away={bracket.sf2.away}
+              match={bracket.sf2.match}
+              label="SF 2"
+              compact
+            />
+          )}
+          {!bracket.sf1 && !bracket.sf2 && (
+            <BracketNode
+              home={bracket.final.home}
+              away={bracket.final.away}
+              match={bracket.final.match}
+              label="Final"
+              compact
+            />
+          )}
         </div>
       </div>
     )
