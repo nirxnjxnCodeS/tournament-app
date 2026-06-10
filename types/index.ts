@@ -40,13 +40,13 @@ export interface Standing {
   form: ('W' | 'D' | 'L')[]  // last 5, newest right
   streak: { type: 'W' | 'D' | 'L' | null; count: number }
   position: number
-  qualified: boolean  // top 4
+  qualified: boolean  // advances to knockouts
   tied: boolean       // flagged if tiebreaker needed
 }
 
 export interface KnockoutBracket {
-  sf1: { home: Player | null; away: Player | null; match: Match | null }
-  sf2: { home: Player | null; away: Player | null; match: Match | null }
+  sf1: { home: Player | null; away: Player | null; match: Match | null } | null
+  sf2: { home: Player | null; away: Player | null; match: Match | null } | null
   final: { home: Player | null; away: Player | null; match: Match | null }
   champion: Player | null
   runner_up: Player | null
