@@ -1,0 +1,47 @@
+import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import type { Database } from './database.types'
+
+// ── Read client (server components, RSC) ─────────────────────────────
+// Uses anon key + public RLS. Safe to call in any server component.
+export async function getSupabaseServer() {
+  const cookieStore = await cookies()
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            )
+          } catch {
+            // Called from a Server Component — cookie mutation is a no-op here,
+            // which is fine since we only need reads in that context.
+          }
+        },
+      },
+    },
+  )
+}
+
+// ── Admin client (server actions only) ───────────────────────────────
+// Uses service role key — bypasses RLS entirely. Never expose to the browser.
+// Only import this from files inside /actions or /app/api.
+export function getSupabaseAdmin() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    },
+  )
+}
