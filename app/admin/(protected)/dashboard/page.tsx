@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <StatCard label="Matches played" value={`${playedCount ?? 0} / ${totalCount ?? 66}`} />
+        <StatCard label="Matches played" value={`${playedCount ?? 0} / ${totalCount ?? 0}`} />
         <StatCard label="Goals scored"   value={String(totalGoals)} />
         <StatCard label="Stage"          value={stageLabel[stage]} accent />
       </div>
