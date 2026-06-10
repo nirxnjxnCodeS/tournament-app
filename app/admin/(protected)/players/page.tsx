@@ -11,7 +11,7 @@ export default async function PlayersPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-text">Players</h1>
-        <span className="text-sm text-text-muted">{players?.length ?? 0} / 12</span>
+        <span className="text-sm text-text-muted">{players?.length ?? 0} players</span>
       </div>
       <PlayerGrid players={players ?? []} />
     </div>
