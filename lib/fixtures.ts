@@ -5,7 +5,6 @@ type FixtureInput = Pick<Match, 'player_a' | 'player_b' | 'stage'>
 /**
  * Round-robin for N players using the circle (polygon) method.
  * Produces exactly N*(N-1)/2 unique pairs, each appearing once.
- * For N=12: 66 matches.
  */
 export function generateRoundRobin(playerIds: string[]): FixtureInput[] {
   const n = playerIds.length
@@ -13,7 +12,6 @@ export function generateRoundRobin(playerIds: string[]): FixtureInput[] {
 
   // Work on a copy — pin index 0, rotate the rest
   const ids = [...playerIds]
-  // If odd number of players, add a bye (null) — not needed for N=12
   const slots = n % 2 === 0 ? ids : [...ids, null]
   const rounds = slots.length - 1
   const half = slots.length / 2
