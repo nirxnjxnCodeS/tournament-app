@@ -1,6 +1,6 @@
 import type { Match } from '@/types'
 
-type FixtureInput = Pick<Match, 'player_a' | 'player_b' | 'stage'>
+type FixtureInput = Pick<Match, 'player_a' | 'player_b' | 'stage' | 'matchday_number'>
 
 /**
  * Round-robin for N players using the circle (polygon) method.
@@ -24,7 +24,7 @@ export function generateRoundRobin(playerIds: string[]): FixtureInput[] {
       const away = slots[slots.length - 1 - i]
       // Skip byes
       if (home !== null && away !== null) {
-        fixtures.push({ player_a: home, player_b: away, stage: 'league' })
+        fixtures.push({ player_a: home, player_b: away, stage: 'league', matchday_number: round + 1 })
       }
     }
     // Rotate: keep slots[0] fixed, rotate the rest clockwise
