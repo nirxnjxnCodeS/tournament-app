@@ -20,15 +20,13 @@ export function PlayerGrid({ players }: PlayerGridProps) {
           <PlayerCard key={p.id} player={p} onEdit={() => setEditing(p)} />
         ))}
 
-        {players.length < 12 && (
-          <button
-            onClick={() => setEditing('new')}
-            className="flex flex-col items-center justify-center gap-2 p-4 bg-surface border border-dashed border-border rounded-card text-text-muted hover:border-accent hover:text-accent transition-colors min-h-[120px]"
-          >
-            <span className="text-2xl leading-none">+</span>
-            <span className="text-xs font-medium">Add player</span>
-          </button>
-        )}
+        <button
+          onClick={() => setEditing('new')}
+          className="flex flex-col items-center justify-center gap-2 p-4 bg-surface border border-dashed border-border rounded-card text-text-muted hover:border-accent hover:text-accent transition-colors min-h-[120px]"
+        >
+          <span className="text-2xl leading-none">+</span>
+          <span className="text-xs font-medium">Add player</span>
+        </button>
       </div>
 
       {editing !== null && (
