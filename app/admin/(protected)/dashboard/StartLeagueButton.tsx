@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { FormError } from '@/components/ui/FormError'
 
+const MIN_PLAYERS = 4
+
 interface StartLeagueButtonProps {
   playerCount: number
 }
@@ -17,11 +19,13 @@ export function StartLeagueButton({ playerCount }: StartLeagueButtonProps) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  if (playerCount !== 12) {
+  const totalFixtures = Math.floor(playerCount * (playerCount - 1) / 2)
+
+  if (playerCount < MIN_PLAYERS) {
     return (
       <div className="flex items-center gap-3 bg-surface border border-border rounded-card px-4 py-3">
         <span className="text-sm text-text-muted">
-          {playerCount}/12 players added — add all 12 to start the league
+          {playerCount} {playerCount === 1 ? 'player' : 'players'} registered. Minimum {MIN_PLAYERS} required.
         </span>
       </div>
     )
@@ -54,8 +58,9 @@ export function StartLeagueButton({ playerCount }: StartLeagueButtonProps) {
       >
         <div className="flex flex-col gap-5">
           <p className="text-sm text-text-muted">
-            This will generate all <strong className="text-text">66 fixtures</strong> for 12 players.
-            This cannot be undone.
+            This will generate all{' '}
+            <strong className="text-text">{totalFixtures} fixtures</strong> for{' '}
+            {playerCount} players. This cannot be undone.
           </p>
 
           {error && <FormError message={error} />}
