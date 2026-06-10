@@ -18,23 +18,21 @@ export async function startLeague(): Promise<{ error?: string }> {
   await requireAdmin()
   const db = getSupabaseAdmin()
 
-  // Must have exactly 12 players
   const { data: players, error: pErr } = await db
     .from('players')
     .select('*')
     .order('created_at')
   if (pErr) return { error: pErr.message }
-  if (!players || players.length !== 12) {
-    return { error: `Need exactly 12 players (have ${players?.length ?? 0})` }
+  if (!players || players.length < 4) {
+    return { error: `Need at least 4 players to start (have ${players?.length ?? 0})` }
   }
 
-  // Generate and validate all 66 fixtures
   const fixtures = generateRoundRobin(players.map((p) => p.id))
-  if (!validateFixtures(fixtures, 12)) {
+  if (!validateFixtures(fixtures, players.length)) {
     return { error: 'Fixture generation failed validation — this is a bug' }
   }
 
-  // Batch insert all 66 matches
+  // Batch insert all fixtures
   const { error: mErr } = await db.from('matches').insert(
     fixtures.map((f) => ({ ...f, status: 'pending' }))
   )
@@ -100,21 +98,30 @@ async function _doAdvanceToKnockouts(): Promise<{ error?: string }> {
   if (!players || !matches) return { error: 'Failed to fetch data' }
 
   const standings = computeStandings(players as Player[], matches as Match[])
-  const [s1, s2, s3, s4] = getSeedsFromStandings(standings)
+  const seeds = getSeedsFromStandings(standings)
 
-  if (!s1 || !s2 || !s3 || !s4) return { error: 'Could not determine top 4 seeds' }
+  if (seeds.length < 2) return { error: 'Could not determine enough seeds' }
+
+  const [s1, s2, s3, s4] = seeds
+  const hasSemis = seeds.length >= 4
 
   // Write bracket seeding (single row, upsert)
   const { error: seedErr } = await db
     .from('bracket_seeding')
-    .upsert({ id: 1, seed_1: s1.id, seed_2: s2.id, seed_3: s3.id, seed_4: s4.id })
+    .upsert({ id: 1, seed_1: s1.id, seed_2: s2.id, seed_3: s3?.id ?? null, seed_4: s4?.id ?? null })
   if (seedErr) return { error: seedErr.message }
 
-  // Create SF matches: SF1 = seed1 vs seed4, SF2 = seed2 vs seed3
-  const sf1 = await createKnockoutMatch(s1.id, s4.id, 'sf1')
-  if (sf1.error) return { error: sf1.error }
-  const sf2 = await createKnockoutMatch(s2.id, s3.id, 'sf2')
-  if (sf2.error) return { error: sf2.error }
+  if (hasSemis) {
+    // SF1 = seed_1 vs seed_4, SF2 = seed_2 vs seed_3
+    const sf1 = await createKnockoutMatch(s1.id, s4!.id, 'sf1')
+    if (sf1.error) return { error: sf1.error }
+    const sf2 = await createKnockoutMatch(s2.id, s3!.id, 'sf2')
+    if (sf2.error) return { error: sf2.error }
+  } else {
+    // Direct final: seed_1 vs seed_2
+    const fin = await createKnockoutMatch(s1.id, s2.id, 'final')
+    if (fin.error) return { error: fin.error }
+  }
 
   // Advance stage
   const { error: stageErr } = await db
@@ -132,14 +139,13 @@ export async function completeTournament(): Promise<{ error?: string }> {
   await requireAdmin()
   const db = getSupabaseAdmin()
 
-  // All 3 knockout matches must be played or walkover
   const { data: koMatches } = await db
     .from('matches')
     .select('stage, status')
     .in('stage', ['sf1', 'sf2', 'final'])
-  if (!koMatches || koMatches.length < 3) return { error: 'Not all knockout matches exist yet' }
+  if (!koMatches || koMatches.length === 0) return { error: 'No knockout matches exist yet' }
   const allDone = koMatches.every((m) => m.status === 'played' || m.status === 'walkover')
-  if (!allDone) return { error: 'All 3 knockout matches must be played first' }
+  if (!allDone) return { error: 'All knockout matches must be played first' }
 
   const { error } = await db
     .from('admin_config')
