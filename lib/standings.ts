@@ -129,6 +129,8 @@ export function computeStandings(players: Player[], matches: Match[]): Standing[
     }
   }
 
+  const qualifiedCount = players.length < 8 ? 2 : 4
+
   return rows.map((s, i) => ({
     player:           s.player,
     played:           s.played,
@@ -142,7 +144,7 @@ export function computeStandings(players: Player[], matches: Match[]): Standing[
     form:             s.form,
     streak:           s.streak,
     position:         i + 1,
-    qualified:        i < 4,
+    qualified:        i < qualifiedCount,
     tied:             tiedIndexes.has(i),
   }))
 }
